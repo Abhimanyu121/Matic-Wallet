@@ -1,4 +1,3 @@
-import 'package:crypto_app_ui/util/data.dart';
 import 'package:crypto_app_ui/widgets/wallet.dart';
 import 'package:flutter/material.dart';
 
@@ -15,20 +14,21 @@ class _WalletsState extends State<Wallets> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView.builder(
+      body: ListView(
         physics: NeverScrollableScrollPhysics(),
         primary: false,
-        itemCount: coins.length,
-        itemBuilder: (BuildContext context, int index) {
-          Map coin = coins[index];
-
-          return Wallet(
-            name: coin['name'],
-            icon: coin['icon'],
-            rate: coin['rate'],
-            color: coin['color'],
-          );
-        },
+        children: <Widget>[
+          Wallet(
+            name: "Ropsten",
+            icon: "assets/eth.png",
+            amount : "123"
+          ),
+          Wallet(
+              name: "Matic",
+              icon: "assets/matic.png",
+              amount : "696969696969"
+          )
+        ],
       ),
     );
   }

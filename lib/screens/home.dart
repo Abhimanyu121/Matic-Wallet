@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:crypto_app_ui/screens/buyandsell.dart';
 import 'package:crypto_app_ui/screens/transactions.dart';
 import 'package:crypto_app_ui/screens/wallets.dart';
-import 'package:crypto_app_ui/util/data.dart';
 import 'package:flutter/material.dart';
 
 
@@ -13,8 +12,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  static Random random = Random();
-  String name = names[random.nextInt(10)];
+  String name = "abc";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,7 +28,7 @@ class _HomeState extends State<Home> {
         children: <Widget>[
           ListTile(
             leading: CircleAvatar(
-              backgroundImage: AssetImage("assets/cm${random.nextInt(10)}.jpeg",),
+              backgroundImage: AssetImage("assets/matic.png",),
               radius: 25,
             ),
             title: Text(name),
