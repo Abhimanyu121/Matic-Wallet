@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-
-
+import 'package:crypto_app_ui/wrappers/moonPayWrapper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 class BuyandSell extends StatefulWidget {
   @override
   _BuyandSellState createState() => _BuyandSellState();
@@ -8,6 +8,17 @@ class BuyandSell extends StatefulWidget {
 
 class _BuyandSellState extends State<BuyandSell> {
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 15.0);
+  _getCard()async {
+    SharedPreferences prefs= await SharedPreferences.getInstance();
+    String jwt = prefs.getString("jwt");
+    MoonPayWrapper wrapper = new MoonPayWrapper();
+    var js = await wrapper.getCardList(jwt);
+    print(js);
+  }
+  @override
+  void initState() {
+    _getCard();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

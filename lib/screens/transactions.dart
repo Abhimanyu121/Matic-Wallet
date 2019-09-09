@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-
-
+import 'package:crypto_app_ui/wrappers/ethWrapper.dart';
+import 'package:toast/toast.dart';
 class Transactions extends StatefulWidget {
   @override
   _TransactionsState createState() => _TransactionsState();
@@ -8,6 +8,8 @@ class Transactions extends StatefulWidget {
 
 class _TransactionsState extends State<Transactions> {
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 15.0);
+  var amount = new TextEditingController();
+  var recipient = new TextEditingController();
   @override
   Widget build(BuildContext context) {
     return ListView(
@@ -27,8 +29,12 @@ class _TransactionsState extends State<Transactions> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: TextField(
+                child: TextFormField(
+                  controller: recipient,
+                  autovalidate: true,
                   obscureText: false,
+                  validator: (val) => val.length==42?
+                  null: "Invalid Input",
                   style: style,
                   decoration: InputDecoration(
                       contentPadding: EdgeInsets.fromLTRB(15,10,15,10),
@@ -39,7 +45,13 @@ class _TransactionsState extends State<Transactions> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: TextField(
+                child: TextFormField(
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  controller: amount,
+                  autovalidate: true,
+                  validator: (val) => val==""?null:(double.parse(val)<=0?
+                  "Invalid amount":
+                  null),
                   obscureText: false,
                   style: style,
                   decoration: InputDecoration(
@@ -55,7 +67,17 @@ class _TransactionsState extends State<Transactions> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
-                  onPressed: (){},
+                  onPressed: ()async {
+                    EthWrapper wrapper= new EthWrapper();
+                    await wrapper.transferToken(recipient.text, double.parse(amount.text)).then((val){
+                      if(val){
+                        Toast.show("Succeful", context, duration: Toast.LENGTH_LONG);
+                      }
+                      else{
+                        Toast.show("Something went Wrong",context,duration: Toast.LENGTH_LONG);
+                      }
+                    });
+                  },
                   padding: EdgeInsets.all(12),
                   color: Colors.blueAccent,
                   child: Text('Transact', style: TextStyle(color: Colors.white)),

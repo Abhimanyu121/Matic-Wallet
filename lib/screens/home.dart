@@ -1,10 +1,9 @@
-import 'dart:math';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:crypto_app_ui/screens/buyandsell.dart';
 import 'package:crypto_app_ui/screens/transactions.dart';
 import 'package:crypto_app_ui/screens/wallets.dart';
 import 'package:flutter/material.dart';
-
+import 'package:toast/toast.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -12,14 +11,58 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  String name = "abc";
+  bool _loading = true;
+  String email;
+  String address;
+  _loademail()async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString("email");
+  }
+  _loadaddress()async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString("address");
+  }
+  @override
+  void initState()  {
+    _loadaddress().then((val){
+     setState(() {
+       address = val;
+     });
+     _loademail().then((value){
+       setState(() {
+         email = value;
+         _loading= false;
+       });
+     });
+   });
+
+
+  }
   @override
   Widget build(BuildContext context) {
+    Wallets wallet =new Wallets();
+    Transactions transactions = new Transactions();
+    BuyandSell buyandSell = new BuyandSell();
     return Scaffold(
       appBar: AppBar(
-        leading: Icon(
+        elevation: 0,
+          shape: RoundedRectangleBorder(),
+        leading:  Icon(
           Icons.menu,
         ),
+        actions: <Widget>[
+
+            FlatButton(
+              child: Text("LOG OUT"),
+              onPressed: ()async {
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                prefs.setString("privateKey", "");
+                Toast.show("Please restart app", context, duration:Toast.LENGTH_LONG);
+              },
+            )
+          ],
+
+//
       ),
 
 
@@ -31,8 +74,8 @@ class _HomeState extends State<Home> {
               backgroundImage: AssetImage("assets/matic.png",),
               radius: 25,
             ),
-            title: Text(name),
-            subtitle: Text(name.toLowerCase().replaceAll(" ", ".")+"@gmail.com"),
+            title: _loading?Text("Loading.."):Text(email, style: TextStyle(fontSize: 12),),
+            subtitle: _loading?Text("Loading.."):Text(address.toUpperCase(),style: TextStyle(fontSize: 12),),
           ),
 
           SizedBox(height: 20),
@@ -64,12 +107,12 @@ class _HomeState extends State<Home> {
 
                   Container(
                     margin: EdgeInsets.only(top: 10),
-                    height: MediaQuery.of(context).size.height*2,
+                    height: MediaQuery.of(context).size.height*1,
                     child: TabBarView(
                       children: <Widget>[
-                        Wallets(),
-                        Transactions(),
-                        BuyandSell(),
+                        wallet,
+                        transactions,
+                        buyandSell,
                       ],
                     ),
                   ),

@@ -141,7 +141,11 @@ class MoonPayWrapper{
       else return false;
     });
   }
-
-
+  Future<dynamic> getCardList (jwt)async {
+    const url ="https://api.moonpay.io/v2/cards";
+    var resp = await http.get(url, headers: {"Authorization": "Bearer "+jwt});
+    var js = jsonDecode(resp.body) as List;
+    return js;
+  }
 
 }
