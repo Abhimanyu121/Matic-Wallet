@@ -1,15 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:crypto_app_ui/wrappers/ethWrapper.dart';
 import 'package:toast/toast.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 class Transactions extends StatefulWidget {
   @override
   _TransactionsState createState() => _TransactionsState();
 }
 
 class _TransactionsState extends State<Transactions> {
+  bool checkingMatic= true;
+  String balanceMatic;
+  _getMatic(){
+    EthWrapper wrapper = new EthWrapper();
+    return  wrapper.checkBalanceMatic();
+  }
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 15.0);
   var amount = new TextEditingController();
   var recipient = new TextEditingController();
+  @override
+  void initState() {
+    _getMatic().then((matic){
+      setState(() {
+        balanceMatic=matic;
+        checkingMatic=false;
+      });
+
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return ListView(
@@ -25,7 +42,7 @@ class _TransactionsState extends State<Transactions> {
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.all(20),
-                child: Text("123 DAI", style: TextStyle(fontSize: 20),),
+                child: checkingMatic? _loader():Text(balanceMatic.toString()+" DAI", style: TextStyle(fontSize: 30),),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -88,5 +105,8 @@ class _TransactionsState extends State<Transactions> {
         ),
       ],
     );
+  }
+  _loader(){
+    return SpinKitChasingDots(size: 30,color: Colors.indigo,);
   }
 }

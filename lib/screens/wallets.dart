@@ -33,8 +33,11 @@ class _WalletsState extends State<Wallets> {
       });
     });
     _getBalanceMatic().then((matic){
-      balanceMatic=matic;
-      checkingMatic=false;
+      setState(() {
+        balanceMatic=matic;
+        checkingMatic=false;
+      });
+
     });
   }
 

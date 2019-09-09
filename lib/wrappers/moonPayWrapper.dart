@@ -96,7 +96,8 @@ class MoonPayWrapper{
    var response = await request.send();
    print(response.statusCode);
 
-   // listen for response
+
+
    response.stream.transform(utf8.decoder).listen((value) {
      print(value);
    });
@@ -106,6 +107,76 @@ class MoonPayWrapper{
    else{
      return false;
    }
+  }
+  Future<dynamic> fileUpload2(path,jwt)async{
+    const url = "https://api.moonpay.io/v2/files";
+    File file = File(path);
+    var length =  await file.length();
+    var stream = new http.ByteStream(DelegatingStream.typed(file.openRead()));
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    request.headers.addAll({"Authorization": "Bearer "+jwt});
+    request.fields['type'] = 'national_identity_card';
+    request.fields['side'] = 'front';
+    request.fields['country'] = 'GBR';
+    var multipartFile = new http.MultipartFile('file', stream, length,
+        filename: basename(file.path));
+    request.files.add(multipartFile);
+    // send
+    var response = await request.send();
+    print(response.statusCode);
+
+
+
+    response.stream.transform(utf8.decoder).listen((value) {
+      print(value);
+    });
+    if(response.statusCode==201){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+  Future<dynamic> fileUpload1(path,jwt)async{
+    const url = "https://api.moonpay.io/v2/files";
+    File file = File(path);
+    var length =  await file.length();
+    var stream = new http.ByteStream(DelegatingStream.typed(file.openRead()));
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    request.headers.addAll({"Authorization": "Bearer "+jwt});
+    request.fields['country'] = 'GBR';
+    request.fields['type'] = 'national_identity_card';
+    request.fields['side'] = 'back';
+    var multipartFile = new http.MultipartFile('file', stream, length,
+        filename: basename(file.path));
+    request.files.add(multipartFile);
+    // send
+    var response = await request.send();
+    print(response.statusCode);
+
+
+
+    response.stream.transform(utf8.decoder).listen((value) {
+      print(value);
+    });
+    if(response.statusCode==201){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+  Future<bool> createIdentity(jwt) async {
+    const url = "https://api.moonpay.io/v2/identity_check";
+    var resp = await http.post(
+        url,
+        headers: {
+          "Authorization": "Bearer "+jwt,
+          "Content-Type" : "application/json"
+        },
+    );
+    print(resp.body);
+    return true;
   }
   Future<dynamic> checkCard (jwt)async {
       const url ="https://api.moonpay.io/v2/cards";
@@ -141,11 +212,25 @@ class MoonPayWrapper{
       else return false;
     });
   }
-  Future<dynamic> getCardList (jwt)async {
+  Future<List<dynamic>> getCardList (jwt)async {
     const url ="https://api.moonpay.io/v2/cards";
     var resp = await http.get(url, headers: {"Authorization": "Bearer "+jwt});
     var js = jsonDecode(resp.body) as List;
     return js;
+  }
+  Future<bool> addMoney(String jwt, String amount, String address, String id) async {
+    const url ="https://api.moonpay.io/v2/transactions";
+    print(jwt);
+    var resp = await http.post(
+      url,
+      headers:{
+        "Authorization": "Bearer "+jwt,
+        "Content-Type": "application/json"
+      },
+      body: jsonEncode({"baseCurrencyAmount": int.parse(amount), "extraFeePercentage": 0, "walletAddress": address, "baseCurrencyCode": "usd", "currencyCode": "dai", "cardId":  id,"returnUrl": "https://buy.moonpay.io"})
+    );
+    print(resp.body);
+    return true;
   }
 
 }

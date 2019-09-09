@@ -311,6 +311,7 @@ class Login_email_ui extends State<Login_email>{
     final firstName = TextFormField(
       keyboardType: TextInputType.text,
       autovalidate: true,
+      autofocus: false,
       validator: (val) => (val.length>1) ?null:"Invalid First Name",
       decoration: InputDecoration(
         hintText: 'First Name',
@@ -363,23 +364,29 @@ class Login_email_ui extends State<Login_email>{
             String picker = await FilePicker.getFilePath(type: FileType.IMAGE);
             wrapper.fileUpload(picker, jwt).then((val){
               if (val){
-                wrapper.checkCard(jwt).then((cardstat){
-                  if(cardstat){
-                  setState(() {
-                    checking =false;
-                    card= true;
-                    file= false;
-                  });
-                  }
-                  else{
-                    setState(() {
-                      checking =false;
-                      card= false;
-                      file= false;
-                      keys =true;
+                wrapper.fileUpload2(picker, jwt).then((val){
+                  wrapper.fileUpload1(picker, jwt).then((val){
+                    wrapper.createIdentity(jwt);
+                    wrapper.checkCard(jwt).then((cardstat){
+                      if(cardstat){
+                        setState(() {
+                          checking =false;
+                          card= true;
+                          file= false;
+                        });
+                      }
+                      else{
+                        setState(() {
+                          checking =false;
+                          card= false;
+                          file= false;
+                          keys =true;
+                        });
+                      }
                     });
-                  }
+                  });
                 });
+
               }
             });
           },

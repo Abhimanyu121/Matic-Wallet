@@ -40,9 +40,7 @@ class _HomeState extends State<Home> {
   }
   @override
   Widget build(BuildContext context) {
-    Wallets wallet =new Wallets();
-    Transactions transactions = new Transactions();
-    BuyandSell buyandSell = new BuyandSell();
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -68,7 +66,7 @@ class _HomeState extends State<Home> {
 
       body: ListView(
         padding: EdgeInsets.symmetric(horizontal: 10),
-        children: <Widget>[
+          children: <Widget>[
           ListTile(
             leading: CircleAvatar(
               backgroundImage: AssetImage("assets/matic.png",),
@@ -110,9 +108,9 @@ class _HomeState extends State<Home> {
                     height: MediaQuery.of(context).size.height*1,
                     child: TabBarView(
                       children: <Widget>[
-                        wallet,
-                        transactions,
-                        buyandSell,
+                        Wallets(),
+                        Transactions(),
+                        BuyandSell(),
                       ],
                     ),
                   ),
