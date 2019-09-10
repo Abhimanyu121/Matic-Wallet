@@ -7,6 +7,7 @@ import 'package:toast/toast.dart';
 import 'package:flutter/services.dart';
 import 'package:crypto_app_ui/wrappers/keyInterface.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:crypto_app_ui/wrappers/ethWrapper.dart';
 import 'package:web3dart/web3dart.dart';
 import 'home.dart';
 class Login_email extends StatefulWidget{
@@ -53,7 +54,7 @@ class Login_email_ui extends State<Login_email>{
           children: <Widget>[
             logo,
             SizedBox(height: 48.0),
-            email? _emailui(): (otp?_otpUi(): details?_details():(file ? _files():(card? _cards(): _keys())))
+            email? _emailui(): (otp?_otpUi(): (details?_details():(file ? _files():(card? _cards(): _keys()))))
           ],
         ),
       ),
@@ -140,6 +141,7 @@ class Login_email_ui extends State<Login_email>{
             borderRadius: BorderRadius.circular(24),
           ),
           onPressed: () async {
+            FocusScope.of(context).requestFocus(FocusNode());
             setState(() {
               checking =true;
             });
@@ -247,6 +249,7 @@ class Login_email_ui extends State<Login_email>{
       return FlatButton(
         child: Text("Go Back"),
         onPressed: (){
+          FocusScope.of(context).requestFocus(FocusNode());
           setState(() {
             email =true;
             otp= false;
@@ -277,6 +280,7 @@ class Login_email_ui extends State<Login_email>{
             borderRadius: BorderRadius.circular(24),
           ),
           onPressed: () async {
+            FocusScope.of(context).requestFocus(FocusNode());
             setState(() {
               checking =true;
             });
@@ -356,6 +360,7 @@ class Login_email_ui extends State<Login_email>{
             borderRadius: BorderRadius.circular(24),
           ),
           onPressed: () async {
+            FocusScope.of(context).requestFocus(FocusNode());
             setState(() {
               checking =true;
             });
@@ -416,6 +421,7 @@ class Login_email_ui extends State<Login_email>{
             borderRadius: BorderRadius.circular(24),
           ),
           onPressed: () async {
+            FocusScope.of(context).requestFocus(FocusNode());
             setState(() {
               checking =true;
             });
@@ -498,6 +504,9 @@ class Login_email_ui extends State<Login_email>{
             borderRadius: BorderRadius.circular(24),
           ),
           onPressed: () async {
+            EthWrapper wrapper = new EthWrapper();
+
+            FocusScope.of(context).requestFocus(FocusNode());
             setState(() {
               checking = true;
             });
@@ -529,6 +538,8 @@ class Login_email_ui extends State<Login_email>{
             borderRadius: BorderRadius.circular(24),
           ),
           onPressed: () async {
+            Toast.show("Generating", context,duration: Toast.LENGTH_LONG);
+            FocusScope.of(context).requestFocus(FocusNode());
             setState(() {
               checking = true;
             });
@@ -541,7 +552,7 @@ class Login_email_ui extends State<Login_email>{
           },
           padding: EdgeInsets.all(12),
           color: Colors.blueAccent,
-          child:Text('Generate mnemonic', style: TextStyle(color: Colors.white)),
+          child:checking? SpinKitCircle(size :10, color: Colors.black,):Text('Generate mnemonic', style: TextStyle(color: Colors.white)),
         ),
       );
     }
@@ -553,10 +564,12 @@ class Login_email_ui extends State<Login_email>{
             borderRadius: BorderRadius.circular(24),
           ),
           onPressed: () async {
+            FocusScope.of(context).requestFocus(FocusNode());
             setState(() {
               checking = true;
             });
             if (gen){
+              Clipboard.setData(new ClipboardData(text: _newMn.text));
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => Home()),
@@ -582,6 +595,7 @@ class Login_email_ui extends State<Login_email>{
             borderRadius: BorderRadius.circular(24),
           ),
           onPressed: () async {
+            FocusScope.of(context).requestFocus(FocusNode());
             setState(() {
               checking = true;
             });

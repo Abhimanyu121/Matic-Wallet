@@ -29,6 +29,8 @@ dependencies:
   async: ^2.1.0
   web3dart: ^1.1.1+1
   bip39: ^1.0.3
+  bitcoin_flutter: 0.1.1
+  clipboard_manager: ^0.0.1
 
 dev_dependencies:
   flutter_test:
@@ -52,6 +54,7 @@ flutter:
     - assets/eth.png
     - assets/StandardToken.json
     - assets/visa.png
+    - assets/RootChain.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

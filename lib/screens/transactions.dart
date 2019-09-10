@@ -31,6 +31,16 @@ class _TransactionsState extends State<Transactions> {
   Widget build(BuildContext context) {
     return ListView(
       children: <Widget>[
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            RaisedButton(
+                child: Icon(Icons.refresh),
+                onPressed: _refresh,
+                shape: RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0))
+            )
+          ],
+        ),
         Card(
           elevation: 4,
           shape: RoundedRectangleBorder(
@@ -50,8 +60,8 @@ class _TransactionsState extends State<Transactions> {
                   controller: recipient,
                   autovalidate: true,
                   obscureText: false,
-                  validator: (val) => val.length==42?
-                  null: "Invalid Input",
+                  validator: (val) => val==""?null:(val.length==42?
+                  null: "Invalid Input"),
                   style: style,
                   decoration: InputDecoration(
                       contentPadding: EdgeInsets.fromLTRB(15,10,15,10),
@@ -85,6 +95,8 @@ class _TransactionsState extends State<Transactions> {
                     borderRadius: BorderRadius.circular(24),
                   ),
                   onPressed: ()async {
+                    FocusScope.of(context).requestFocus(FocusNode());
+                    Toast.show("Transacting", context,duration: Toast.LENGTH_LONG);
                     EthWrapper wrapper= new EthWrapper();
                     await wrapper.transferToken(recipient.text, double.parse(amount.text)).then((val){
                       if(val){
@@ -105,6 +117,19 @@ class _TransactionsState extends State<Transactions> {
         ),
       ],
     );
+  }
+  _refresh(){
+    setState(() {
+      checkingMatic= true;
+    });
+
+    _getMatic().then((matic){
+      setState(() {
+        balanceMatic=matic;
+        checkingMatic=false;
+      });
+
+    });
   }
   _loader(){
     return SpinKitChasingDots(size: 30,color: Colors.indigo,);

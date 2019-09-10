@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:crypto_app_ui/wrappers/moonPayWrapper.dart';
 import 'package:toast/toast.dart';
+import 'package:crypto_app_ui/wrappers/ethWrapper.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 class CardWidget extends StatefulWidget{
   String cardDigit;
   String year;
@@ -26,6 +28,7 @@ class CardWidgetUi extends State<CardWidget>{
   }
   @override
   Widget build(BuildContext context) {
+    bool poc= false;
     TextEditingController _amount = new TextEditingController();
     // TODO: implement build
     return Card(
@@ -60,8 +63,9 @@ class CardWidgetUi extends State<CardWidget>{
           ),
           Text("Expiry Year: "+year,),
           SizedBox(
-            height: 20,
+            height: 10,
           ),
+          Text("*It will take around 2 minutes to reflect in account", style: TextStyle(color: Colors.red),),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextFormField(
@@ -85,27 +89,37 @@ class CardWidgetUi extends State<CardWidget>{
                 borderRadius: BorderRadius.circular(24),
               ),
               onPressed: ()async{
-                await SharedPreferences.getInstance().then((prefs){
-                  var address = prefs.getString("address");
-                  var jwt = prefs.getString("jwt");
-                  var amount = _amount.text.toString();
-                  print(cardId);
-                  MoonPayWrapper wrapper = new MoonPayWrapper();
-                  wrapper.addMoney(jwt, amount, address, cardId).then((val){
-                    if(val){
-                      Toast.show("Done!", context,duration: Toast.LENGTH_LONG);
-                    }
-                    else{
-                      Toast.show("Something went wrong :(", context,duration: Toast.LENGTH_LONG);
-                    }
-                  });
-
-
+                FocusScope.of(context).requestFocus(FocusNode());
+                setState(() {
+                  poc=true;
                 });
+                Toast.show("Processing!", context,duration: Toast.LENGTH_LONG);
+                await SharedPreferences.getInstance().then((prefs){
+                    MoonPayWrapper wrapper = new MoonPayWrapper();
+                    var address = prefs.getString("address");
+                    var jwt = prefs.getString("jwt");
+                    var amount = _amount.text.toString();
+                    wrapper.addMoney(jwt, amount, address, cardId).then((val){
+                      if(val){
+                        prefs.setString("first", "yep");
+                        Toast.show("Done!", context,duration: Toast.LENGTH_LONG);
+                        setState(() {
+                          poc=false;
+                        });
+                      }
+                      else{
+                        Toast.show("Something went wrong :(", context,duration: Toast.LENGTH_LONG);
+                        setState(() {
+                          poc=false;
+                        });
+                      }
+                    });
+                });
+
               },
               padding: EdgeInsets.all(12),
               color: Colors.blueAccent,
-              child: Text('Transact', style: TextStyle(color: Colors.white)),
+              child: poc? SpinKitCircle(size :10, color: Colors.black,): Text('Transact', style: TextStyle(color: Colors.white)),
             ),
           )
         ],

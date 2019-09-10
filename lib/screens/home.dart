@@ -4,6 +4,7 @@ import 'package:crypto_app_ui/screens/transactions.dart';
 import 'package:crypto_app_ui/screens/wallets.dart';
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
+import 'package:clipboard_manager/clipboard_manager.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -45,10 +46,30 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         elevation: 0,
           shape: RoundedRectangleBorder(),
-        leading:  Icon(
-          Icons.menu,
+        leading:  SizedBox(
+          width: 200,
+          child: CircleAvatar(
+            backgroundImage: AssetImage("assets/matic.png",),
+            radius: 25,
+          ),
         ),
         actions: <Widget>[
+          FlatButton(
+            onPressed: (){
+              ClipboardManager.copyToClipBoard(address).then((asd){
+                Toast.show("Address copied", context);
+              });
+            },
+            child: Column(
+              children: <Widget>[
+                SizedBox(
+                  height: 15,
+                ),
+                _loading?Text("Loading.."):Text(email, style: TextStyle(fontSize: 10),),
+                _loading?Text("Loading.."):Text(address.toUpperCase(),style: TextStyle(fontSize: 10),maxLines: 2,),
+              ],
+            ),
+          ),
 
             FlatButton(
               child: Text("LOG OUT"),
@@ -67,16 +88,7 @@ class _HomeState extends State<Home> {
       body: ListView(
         padding: EdgeInsets.symmetric(horizontal: 10),
           children: <Widget>[
-          ListTile(
-            leading: CircleAvatar(
-              backgroundImage: AssetImage("assets/matic.png",),
-              radius: 25,
-            ),
-            title: _loading?Text("Loading.."):Text(email, style: TextStyle(fontSize: 12),),
-            subtitle: _loading?Text("Loading.."):Text(address.toUpperCase(),style: TextStyle(fontSize: 12),),
-          ),
 
-          SizedBox(height: 20),
 
           Align(
             alignment: Alignment.center,
@@ -98,7 +110,7 @@ class _HomeState extends State<Home> {
                         text: "Transactions",
                       ),
                       Tab(
-                        text: "Buy/Sell",
+                        text: "Cards",
                       ),
                     ],
                   ),

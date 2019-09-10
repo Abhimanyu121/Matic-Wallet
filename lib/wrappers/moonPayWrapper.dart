@@ -232,5 +232,44 @@ class MoonPayWrapper{
     print(resp.body);
     return true;
   }
+  Future<bool> addEth(String jwt, String address, String id) async {
+    const url ="https://api.moonpay.io/v2/transactions";
+    print(jwt);
+    var resp = await http.post(
+        url,
+        headers:{
+          "Authorization": "Bearer "+jwt,
+          "Content-Type": "application/json"
+        },
+        body: jsonEncode({"baseCurrencyAmount": 20, "extraFeePercentage": 0, "walletAddress": address, "baseCurrencyCode": "usd", "currencyCode": "eth", "cardId":  id,"returnUrl": "https://buy.moonpay.io"})
+    );
+    print(resp.body);
+    return true;
+  }
+  Future<dynamic> addCard2 (jwt ) async {
+    const url = "https://api.moonpay.io/v2/cards";
+    await http.post(
+      url,
+      headers: {
+        "Authorization": "Bearer "+jwt,
+        "Content-Type": "application/json"
+      },
+      body: json.encode({
+        "number": "4002629798205148",
+        "expiryMonth": 12,
+        "expiryYear": 2020,
+        "cvc": "123"
+      }),
+    ).then((resp) async {
+      print(resp.body);
+      var js = jsonDecode(resp.body);
+      print(js["expiryMonth"]);
+      if(js["expiryMonth"]==12){
+        print("here");
+        return true;
+      }
+      else return false;
+    });
+  }
 
 }
