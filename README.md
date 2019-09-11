@@ -1,49 +1,42 @@
-# 🔥🔥 Flutter Cryptocurrency app Concept [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+# Matic Wallet
+## Aim
+Matic Wallet Aims to make transactions of crypto currencies(Currently Moon Token) Faster and cost effective by utilizing the enormous potential of Matic's Plasma chain.
+## Description
+Matic Wallet in testing phase has three layers of technology,
+1. Moonpay - It proivdes easy and efficient fiat to Crypto Interface
+2. Ropsten - Ropsten acts as intermediate layer between Moonpay and Matic chain
+3. Matic Network - It allows Users to send their crpyto tokens with astounding speed and least transaction fee.
+On combining all three of these it provides an efficient solution for the primary drawbacks of the Ethereum chain.
+## Current Progress
+- [x] Moonpay Fiat to crypto Interface.
+- [x] Transfer of tokens from one address to another on matic network.
+- [x] Depositing Moon(approve, allowance and deposit) Tokens to Matic network(Sometimes might throw exceptions).
+- [x] Checking status of transactions uisng etherscan.
+- [ ] Withdrawl of Tokens from matic to Ropsten.
+- [ ] Moving heavy and time consuming transactions to background service.
+## How to use
+1. Login with your email.
+2. Upload a Selfie of you along with ID card(In test phase uploading any photo will work).
+3. Enter Details of your Debit/ Credit Cards(Currently Test cards are hard coded so enter anythin random).
+4. Generate a new account or enter private key(generate new account for testing, instead of using primary account).
+5. Go to cards section and add some tokens to your wallet(Check email for transaction hash, and check it on ropsten etherscan).
+5. In wallets tab, tap approve all and refresh in a while(till transaction gets merged).
+6. Then tap on allow all button to allow matic contract to spend dai(Moon tokens).
+7. You can tap on transaction hash to copy it and check it on etherscan.
+8. Once transaction is merged, deposit tokend to matic chain.
+9. Transact the tokens over matic network as much as you like with its low cost and fast transactions.
+#### Note 1: It has a lot of jagged edge, in case it behaves abnomally, ping me on Telegram @abhimanyu121.
+#### Note 2: Please enter correct inputs, exceptional handling is not properly implmented yet.
+#### Note 3: Withdraw of tokens from matic network is not available as of now due to limited time.
 
-Flutter representation of a Crypto app Concept from [Uplabs](https://www.uplabs.com/posts/crypto-app-6a473389-202b-4cee-ad23-94cf46c172cd).
-
-Star⭐ the repo if you like what you see😉.
-
-Images are from [Unsplash](https://unsplash.com)
-
-
-<a href="ss/app.apk"><img src="https://playerzon.com/asset/download.png" width="200"></img></a>
-
-## ✨ Requirements
-* Any Operating System (ie. MacOS X, Linux, Windows)
-* Any IDE with Flutter SDK installed (ie. IntelliJ, Android Studio, VSCode etc)
-* A little knowledge of Dart and Flutter
-* A brain to think 🤓🤓
-
-
-## 📸 ScreenShots
-
-<img src="ss/1.png"/>
-
-| Light| Dark|
-|------|-------|
-|<img src="ss/2.png" width="400">|<img src="ss/3.png" width="400">|
-|<img src="ss/4.png" width="400">|<img src="ss/5.png" width="400">|
-
-
-## 🌗 Toggle theme
-To toggle the theme, change the `isDark` variable in `main.dart`.
-
-`true` for dark and `false` for light.
-
-
-## 🤓 Author(s)
-**Olusegun Festus Babajide**
-
-
-## ☕️  Donate
-
-Buy me a cup of Coffee😁
-
-| Mode | Link/Wallet|
-| ------| ------------|
-| Bitcoin | 3GrziPW6Gz6S5mXo2EsiYpafW8vXVq5Rbv|
-
+## Screenshots
+![Alt text](ss/photo_2019-09-11_20-34-46.jpg ?raw=true "Title")
+## Tech stack Used
+1. Flutter
+2. Web3Dart
+3. Moonpay Rest Interface
+4. Matic Plasma Chain
+5. Ropsten test Chain
 
 ## 🔖 LICENCE
 [WTFPL](http://www.wtfpl.net/about/)
