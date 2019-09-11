@@ -24,6 +24,7 @@ class _WalletsState extends State<Wallets> {
   int loading=0;
   bool checking =true;
   bool eth =false;
+  bool err =false;
   var _amount = new TextEditingController();
   bool checkingMatic= true;
   bool transfering =false;
@@ -76,9 +77,11 @@ class _WalletsState extends State<Wallets> {
             setState(() {
               json =jss;
             });
+            _check();
             return jss;
           });
         }
+
 
 
     });
@@ -108,7 +111,7 @@ class _WalletsState extends State<Wallets> {
     return hash;
   }
 _check()async{
-  if(json["result"]["status"]==1){
+  if(json["result"]["status"]=="1"||json["message"]=="NOTOK"||json["result"]["Status"]=="0"){
      await SharedPreferences.getInstance().then((prefs){
        setState(() {
          transacting=false;
@@ -117,6 +120,13 @@ _check()async{
        prefs.setBool("transacting", false);
      });
 
+  }
+  if(json["message"]=="NOTOK"||json["result"]["Status"]=="0"){
+    setState(() {
+      transacting =false;
+      err= true;
+    });
+    print("err: check"+err.toString());
   }
 }
 
@@ -158,6 +168,7 @@ _check()async{
         _check();
       });
     });
+    _check();
 
     _getBalance().then((str){
       setState(() {
@@ -175,6 +186,7 @@ _check()async{
 
     });
 
+
     print("js: "+json.toString());
   }
 
@@ -186,7 +198,7 @@ _check()async{
       body: ListView(
         shrinkWrap:true,
         physics: ScrollPhysics(),
-        primary: true,
+        primary: false,
         //mainAxisAlignment: MainAxisAlignment.center,
         //crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
@@ -199,10 +211,15 @@ _check()async{
                   shape: RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0))
               ),
               RaisedButton(
-                  child: loading!=5?_loader():(transacting?Text("Refresh Transaction"):(approve?Text("Approve all"):(allowance?Text("Allow Contract"):Text("Nothing yet")))),
+                  child: loading!=5?_loader():(transacting?Text("Refresh Transaction"):(approve?Text("Approve all"):(allowance?Text("Allow Contract"):((json["message"]=="NOTOK"||json["result"]["status"]=="0")?Text("Increase Allowance"):Text("Refresh"))))),
                   onPressed:(){
                     if(loading==5){
-                      if(transacting)
+                      if((json["message"]=="NOTOK"||json["result"]["status"]=="0"))
+                      {
+                        _incAllow();
+                        _refreshTx();
+                      }
+                      else if(transacting)
                       {
                         _refreshTx();
                       }
@@ -212,6 +229,10 @@ _check()async{
                       }
                       else if(allowance){
                         _allow();
+                        _refreshTx();
+                      }
+                      else if(json["message"]=="NOTOK"||json["result"]["Status"]=="0"){
+                        _incAllow();
                         _refreshTx();
                       }
                       else{
@@ -256,14 +277,22 @@ _check()async{
                       SizedBox(
                         height: 10,
                       ),
-                      (hash==" "||hash=="")?Container(height: 0,width: 0,):((json["result"]["status"]=="1"?Text("Transaction has been merged"):Text("Transaction not merged yet"))),
+                      (hash==" "||hash=="")?
+                        Container(height: 0,width: 0,)
+                          :((json["message"]=="NOTOK"||json["result"]["status"]=="0")?Text("Transaction Ended with error")
+                          :(json["result"]["status"]=="1"?Text("Transaction has been merged")
+                          :Text("Transaction not merged yet"))),
                       //js==null?Container(height: 0,width: 0,):
                       SizedBox(
                         height: 10,
                       ),
-                      (hash==" "||hash=="")?Container(height: 0,width: 0,):(json==null?Container(height: 0,width: 0,):(json["result"]["status"]=="1"?Icon(Icons.check , size: 30,):SpinKitChasingDots(color: Colors.blue,size: 30,))),
+                      (hash==" "||hash=="")?
+                      Container(height: 0,width: 0,)
+                          :((json["message"]=="NOTOK"||json["result"]["status"]=="0")?Icon(Icons.error)
+                          :(json==null?Container(height: 0,width: 0,)
+                          :(json["result"]["status"]=="1"?Icon(Icons.check , size: 30,)
+                          :SpinKitChasingDots(color: Colors.blue,size: 30,)))),
                       SizedBox(height: 40,),
-
                     ],
                   ),
                 ],
@@ -455,6 +484,7 @@ _check()async{
       EthWrapper wrapper = new EthWrapper();
       await wrapper.depositERC20(double.parse(_amount.text),).then((val){
         print("wallet:" +val);
+        _refreshTx();
         setState(() {
           txDeposit=val;
         });
@@ -543,6 +573,37 @@ _check()async{
       }
     });
   }
+  _incAllow()async {
+    EthWrapper wrapper = new EthWrapper();
+    await wrapper.checkEth().then((val)async{
+      BigInt wei = val;
+      if(balanceRopsten=="0"||balanceRopsten=="0.0"){
+        Toast.show("Insufficient Funds", context);
+      }
+      else{
+
+        if(wei<BigInt.from(1500000000000000)){
+          _asyncConfirmDialog(context);
+        }
+        else{
+          EthWrapper wrapper = new EthWrapper();
+          await wrapper.incAllowanceToken().then((val)async{
+            SharedPreferences prefs =await SharedPreferences.getInstance();
+            //prefs.setBool("allow", false);
+            prefs.setBool("transacting", true);
+            setState(() {
+              err= false;
+            });
+            _refreshTx();
+          });
+
+
+          Toast.show("In Proccess, wait for 2 minutes", context,duration: Toast.LENGTH_LONG);
+
+        }
+      }
+    });
+  }
   _approveAll()async {
     print("called");
     EthWrapper wrapper = new EthWrapper();
@@ -608,8 +669,10 @@ _check()async{
         loading++;
         //this.json= json;
         print("check3:"+this.json.toString());
+        _check();
       });
     });
+
 
   }
 

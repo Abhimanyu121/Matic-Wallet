@@ -184,6 +184,49 @@ class EthWrapper{
     });
 
   }
+  Future<dynamic> incAllowanceToken() async {
+    var apiUrl = "https://ropsten.infura.io/v3/311ef590f7e5472a90edfa1316248cff";
+    final client = Web3Client(apiUrl, http.Client());
+    await rootBundle.loadString('assets/StandardToken.json').then((abi)async {
+      await SharedPreferences.getInstance().then((prefs)async {
+        String privateKey = prefs.getString("privateKey");
+        Credentials credentials = EthPrivateKey.fromHex(privateKey);
+        final address = await credentials.extractAddress();
+        print(address);
+        final contract  =  DeployedContract(ContractAbi.fromJson(abi, "StandardTOken"),EthereumAddress.fromHex(moonRopsten));
+        print(contract.abi.toString());
+        print(contract.address);
+        var allow = contract.function('increaseAllowance');
+
+        await client.sendTransaction(
+          credentials,
+          Transaction.callContract(
+              contract: contract,
+              function: allow,
+              //nonce: int.parse(nonce),
+              //nonce: Random.secure().nextInt(100),
+              gasPrice: EtherAmount.inWei(BigInt.from(10000000000)),
+              maxGas: 4000000,
+              parameters: [EthereumAddress.fromHex(rootChainAddress),BigInt.from(9999 * 1000) * BigInt.from(1000000000000000)]
+          ),
+          chainId: 3,
+
+        ).then((hash)async{
+          print("completing approve:"+hash );
+          await client.dispose().then((vod)async {
+            prefs.setString("hash", hash);
+            prefs.setBool("transacting", true);
+
+          });
+          return hash;
+        });
+
+
+      });
+
+    });
+
+  }
   Future<dynamic> depositERC20 (double amount,)async {
 
     var apiUrl = "https://ropsten.infura.io/v3/311ef590f7e5472a90edfa1316248cff";

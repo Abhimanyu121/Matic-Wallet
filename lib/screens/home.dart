@@ -21,6 +21,7 @@ class _HomeState extends State<Home> {
   }
   _loadaddress()async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    //print(prefs.getString("privateKey"));
     return prefs.getString("address");
   }
   @override
@@ -60,6 +61,7 @@ class _HomeState extends State<Home> {
                 Toast.show("Address copied", context);
               });
             },
+
             child: Column(
               children: <Widget>[
                 SizedBox(
@@ -70,6 +72,9 @@ class _HomeState extends State<Home> {
               ],
             ),
           ),
+            SizedBox(
+            width: 30,
+            ),
 
             FlatButton(
               child: Text("LOG OUT"),
