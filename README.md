@@ -30,7 +30,10 @@ On combining all three of these it provides an efficient solution for the primar
 #### Note 3: Withdraw of tokens from matic network is not available as of now due to limited time.
 
 ## Screenshots
-![Alt text](ss/photo_2019-09-11_20-34-46.jpg ?raw=true "Title")
+|<img src="ss/1.jpg" width="400">|<img src="ss/2.png" width="400">|
+|<img src="ss/4.jpg" width="400">|<img src="ss/3.png" width="400">|
+|<img src="ss/5.jpg" width="400">|<img src="ss/6.png" width="400">|
+|<img src="ss/8.jpg" width="400">|<img src="ss/7.png" width="400">|
 ## Tech stack Used
 1. Flutter
 2. Web3Dart
