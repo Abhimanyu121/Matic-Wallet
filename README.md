@@ -29,7 +29,8 @@ On combining all three of these it provides an efficient solution for the primar
 #### Note 2: Please enter correct inputs, exceptional handling is not properly implmented yet.
 #### Note 3: Withdraw of tokens from matic network is not available as of now due to limited time.
 
-
+## Screenshots
+![Alt text](ss/photo_2019-09-11_20-34-46.jpg ?raw=true "Title")
 ## Tech stack Used
 1. Flutter
 2. Web3Dart
