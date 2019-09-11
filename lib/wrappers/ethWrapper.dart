@@ -1,7 +1,6 @@
 import 'package:web3dart/web3dart.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart' show rootBundle;
-import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
 class EthWrapper{
   final rootChainAddress = "0x60e2b19b9a87a3f37827f2c8c8306be718a5f9b4";
@@ -98,7 +97,7 @@ class EthWrapper{
     await client.dispose();
     return true;
   }
-  Future<dynamic> approveToken(double amount) async {
+  Future<dynamic> approveToken(double amount,) async {
     var apiUrl = "https://ropsten.infura.io/v3/311ef590f7e5472a90edfa1316248cff";
     final client = Web3Client(apiUrl, http.Client());
     await rootBundle.loadString('assets/StandardToken.json').then((abi)async {
@@ -113,22 +112,29 @@ class EthWrapper{
         print(contract.address);
         var appr = contract.function('approve');
 
-        var txhash =await client.sendTransaction(
+        await client.sendTransaction(
             credentials,
             Transaction.callContract(
                 contract: contract,
                 function: appr,
+                //nonce: int.parse(nonce),
                 //nonce: Random.secure().nextInt(100),
-                gasPrice: EtherAmount.inWei(BigInt.from(1000000000)),
-                maxGas: 5000000,
+                gasPrice: EtherAmount.inWei(BigInt.from(10000000000)),
+                maxGas: 4000000,
                 parameters: [EthereumAddress.fromHex(rootChainAddress),BigInt.from(amount*1000)*BigInt.from(1000000000000)]
             ),
             chainId: 3,
 
-          );
+          ).then((hash)async{
+          print("completing approve:"+hash );
+          await client.dispose().then((vod)async {
+            prefs.setString("hash", hash);
+            prefs.setBool("transacting", true);
+
+          });
+          return hash;
+        });
        // await client.dispose();
-        print("completing approve:"+txhash );
-        return txhash;
 
       });
 
@@ -147,31 +153,38 @@ class EthWrapper{
         final contract  =  DeployedContract(ContractAbi.fromJson(abi, "StandardTOken"),EthereumAddress.fromHex(moonRopsten));
         print(contract.abi.toString());
         print(contract.address);
-        var allow = contract.function('increaseAllowance');
+        var allow = contract.function('allowance');
 
-        var txhash =await client.sendTransaction(
+        await client.sendTransaction(
           credentials,
           Transaction.callContract(
               contract: contract,
               function: allow,
+              //nonce: int.parse(nonce),
               //nonce: Random.secure().nextInt(100),
-              gasPrice: EtherAmount.inWei(BigInt.from(1000000000)),
-              maxGas: 7000000,
-              parameters: [EthereumAddress.fromHex(rootChainAddress),BigInt.from(999999*1000)*BigInt.from(1000000000000)]
+              gasPrice: EtherAmount.inWei(BigInt.from(10000000000)),
+              maxGas: 4000000,
+              parameters: [EthereumAddress.fromHex(rootChainAddress),address]
           ),
           chainId: 3,
 
-        );
-       // await client.dispose();
-        print("completing allow:"+txhash );
-        return txhash;
+        ).then((hash)async{
+          print("completing approve:"+hash );
+          await client.dispose().then((vod)async {
+            prefs.setString("hash", hash);
+            prefs.setBool("transacting", true);
+
+          });
+          return hash;
+        });
+
 
       });
 
     });
 
   }
-  Future<dynamic> depositERC20 (double amount)async {
+  Future<dynamic> depositERC20 (double amount,)async {
 
     var apiUrl = "https://ropsten.infura.io/v3/311ef590f7e5472a90edfa1316248cff";
     final client = Web3Client(apiUrl, http.Client(), enableBackgroundIsolate: true);
@@ -185,14 +198,15 @@ class EthWrapper{
             ContractAbi.fromJson(abi, "RootChain"),
             EthereumAddress.fromHex(rootChainAddress));
         var deposit = contract.function('deposit');
-        var txhash =await client.sendTransaction(
+        await client.sendTransaction(
               credentials,
               Transaction.callContract(
                   contract: contract,
                   function: deposit,
                  // nonce: Random.secure().nextInt(100),
-                  gasPrice: EtherAmount.inWei(BigInt.from(1000000000)),
+                  gasPrice: EtherAmount.inWei(BigInt.from(10000000000)),
                   maxGas: 4000000,
+                  //nonce: int.parse(nonce),
                   parameters: [
                     EthereumAddress.fromHex(moonRopsten),
                     address,
@@ -202,14 +216,19 @@ class EthWrapper{
 
               chainId: 3,
 
-            );
-        //await client.dispose().then((xc){
-          print("completing deposit:"+txhash );
-          return txhash;
-        //});
+        ).then((hash)async{
+          print("completing approve:"+hash );
+          prefs.setString("hash", hash);
+          prefs.setBool("transacting", true);
+          await client.dispose().then((vod)async {
 
+          });
+          return hash;
+        });
+        // await client.dispose();
 
       });
+
     });
 
   }

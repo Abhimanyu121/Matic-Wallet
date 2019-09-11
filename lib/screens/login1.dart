@@ -565,6 +565,9 @@ class Login_email_ui extends State<Login_email>{
           ),
           onPressed: () async {
             FocusScope.of(context).requestFocus(FocusNode());
+            SharedPreferences prefs= await SharedPreferences.getInstance();
+            prefs.setBool("allow", true);
+            prefs.setBool("approve",true);
             setState(() {
               checking = true;
             });

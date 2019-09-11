@@ -102,7 +102,14 @@ class CardWidgetUi extends State<CardWidget>{
                     wrapper.addMoney(jwt, amount, address, cardId).then((val){
                       if(val){
                         prefs.setString("first", "yep");
-                        Toast.show("Done!", context,duration: Toast.LENGTH_LONG);
+                        if(prefs.getString("first")=="yep"){
+                          prefs.setBool("approve", true);
+                        }else{
+                          prefs.setBool("approve", true);
+                          prefs.setBool("allow", true);
+                        }
+
+                        Toast.show("Done! Check Mail ", context,duration: Toast.LENGTH_LONG);
                         setState(() {
                           poc=false;
                         });

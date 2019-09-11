@@ -5,6 +5,7 @@ import 'package:crypto_app_ui/wrappers/moonPayWrapper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 import 'package:clipboard_manager/clipboard_manager.dart';
+import 'package:crypto_app_ui/wrappers/ScannerWRapper.dart';
 class Wallets extends StatefulWidget {
   @override
   _WalletsState createState() => new _WalletsState();
@@ -13,11 +14,14 @@ class Wallets extends StatefulWidget {
 class _WalletsState extends State<Wallets> {
   String balanceRopsten="123";
   String balanceMatic= "Asd";
-  String txApprove="";
+  bool allowance =false;
   String txAllow="";
+  bool approve= false;
   String txDeposit="";
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
-  new GlobalKey<RefreshIndicatorState>();
+  bool transacting =false;
+  Map json={"result":{"status":"0"}};
+  String hash=" ";
+  int loading=0;
   bool checking =true;
   bool eth =false;
   var _amount = new TextEditingController();
@@ -31,12 +35,130 @@ class _WalletsState extends State<Wallets> {
      return  wrapper.checkBalanceRopsten();
 
   }
+  _getApproveStatus()async{
+    SharedPreferences prefs =await SharedPreferences.getInstance();
+    if(prefs.getBool("approve")==true)
+      return true;
+    else
+      return false;
+  }
+  _getAllownceStatus()async{
+    SharedPreferences prefs =await SharedPreferences.getInstance();
+    if(prefs.getBool("allow")==true)
+      return true;
+    else
+      return false;
+  }
+  _getTransaction() async{
+    await SharedPreferences.getInstance().then((prefs)async{
+      String hash= prefs.getString("hash");
+
+      bool transacting = prefs.getBool("transacting");
+      if(transacting==true) {
+        setState(() {
+          transacting = true;
+        });
+      }else{
+        setState(() {
+          transacting= false;
+        });
+      }
+       // print("chhas:"+hash);
+        if(hash ==""||hash==null){
+          Map mv ={"status":"0"};
+          return mv;
+        }else{
+          print("here");
+          ScannerWrapper wrapper = new ScannerWrapper();
+          await  wrapper.getDetails(hash).then((jss){
+
+            print("checking:"+jss.toString());
+            setState(() {
+              json =jss;
+            });
+            return jss;
+          });
+        }
+
+
+    });
+
+  }
+  _getStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool transacting = prefs.getBool("transacting");
+    if(transacting== true)
+      return transacting;
+    else
+      return false;
+  }
   _getBalanceMatic(){
     EthWrapper wrapper = new EthWrapper();
     return  wrapper.checkBalanceMatic();
   }
+  _getHash()async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String hash = prefs.getString("hash");
+    if(hash==null||hash=="")
+      return "There are no Transactions";
+    else
+      setState(() {
+        this.hash = hash;
+      });
+    return hash;
+  }
+_check()async{
+  if(json["result"]["status"]==1){
+     await SharedPreferences.getInstance().then((prefs){
+       setState(() {
+         transacting=false;
+         print("check2:"+transacting.toString());
+       });
+       prefs.setBool("transacting", false);
+     });
+
+  }
+}
+
   @override
   void initState() {
+    loading =0;
+    _getApproveStatus().then((val){
+      setState(() {
+        loading++;
+        approve =val;
+      });
+
+    });
+    _getAllownceStatus().then((val){
+      setState(() {
+        loading++;
+        allowance =val;
+      });
+
+    });
+    _getHash().then((str){
+      setState(() {
+        loading++;
+       // hash= str;
+      });
+    });
+    _getStatus().then((val){
+      setState(() {
+        loading++;
+        //transacting= val;
+      });
+
+    });
+    _getTransaction().then((json){
+      setState(() {
+        loading++;
+        //this.json= json;
+        print("check1:"+json.toString());
+        _check();
+      });
+    });
+
     _getBalance().then((str){
       setState(() {
         //print("amount :"+str);
@@ -44,6 +166,7 @@ class _WalletsState extends State<Wallets> {
         checking = false;
       });
     });
+
     _getBalanceMatic().then((matic){
       setState(() {
         balanceMatic=matic;
@@ -51,236 +174,259 @@ class _WalletsState extends State<Wallets> {
       });
 
     });
+
+    print("js: "+json.toString());
   }
 
   @override
   Widget build(BuildContext context) {
     TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 15.0);
-
+    //double c_width = MediaQuery.of(context).size.width*0.8;
     return Scaffold(
-      body: RefreshIndicator(
-        key: _refreshIndicatorKey,
-        onRefresh: (){
-          _refresh().then((){
-            _refreshIndicatorKey.currentState.dispose();
-          });
-        },
-        child: ListView(
-          physics: NeverScrollableScrollPhysics(),
-          primary: false,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                RaisedButton(
-                    child: Icon(Icons.refresh),
-                    onPressed: _refresh,
-                    shape: RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0))
-                ),
-                RaisedButton(
-                    child: Text("Approve all"),
-                    onPressed: _approveAll,
-                    shape: RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0))
-                )
-              ],
-            ),
-          txApprove==""||txApprove==null?SizedBox(height: 1,):Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Text(txApprove,style: TextStyle(fontSize: 10),),
-                FlatButton(
-                  onPressed: (){
-                    ClipboardManager.copyToClipBoard(txApprove).then((asd){
-                      Toast.show("Hash copied", context);
-                    });
-                  },
-                  child: Icon(Icons.content_copy),
-                )
-              ],
-            ),
-            txAllow==""||txAllow==null?SizedBox(height: 1,):Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Text(txApprove,style: TextStyle(fontSize: 10),),
-                FlatButton(
-                  onPressed: (){
-                    ClipboardManager.copyToClipBoard(txAllow).then((asd){
-                      Toast.show("Hash copied", context);
-                    });
-                  },
-                  child: Icon(Icons.content_copy),
-                )
-              ],
-            ),
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(10),
-                ),
+      body: ListView(
+        shrinkWrap:true,
+        physics: ScrollPhysics(),
+        primary: true,
+        //mainAxisAlignment: MainAxisAlignment.center,
+        //crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              RaisedButton(
+                  child: Icon(Icons.refresh),
+                  onPressed: _refresh,
+                  shape: RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0))
               ),
-              child: transfering?_transfering():Column(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
+              RaisedButton(
+                  child: loading!=5?_loader():(transacting?Text("Refresh Transaction"):(approve?Text("Approve all"):(allowance?Text("Allow Contract"):Text("Nothing yet")))),
+                  onPressed:(){
+                    if(loading==5){
+                      if(transacting)
+                      {
+                        _refreshTx();
+                      }
+                      else if(approve){
+                        _approveAll() ;
+                        _refreshTx();
+                      }
+                      else if(allowance){
+                        _allow();
+                        _refreshTx();
+                      }
+                      else{
+                        _refreshTx();
+                        Toast.show("Nothing to do right now",context);
+                      }
+                    }
+                  } ,
+                  shape: RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0))
+              )
+            ],
+          ),
+          Card(
+            elevation: 4,
 
-                        Row(
-                          children: <Widget>[
-                            Image.asset(
-                              "assets/eth.png",
-                              height: 30,
-                              width: 25,
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              "Ropsten",
-                              style: TextStyle(
-                                fontSize: 30,
-                              ),
-                            ),
-
-                          ],
-                        ),
-                        checking? _loader():Text((double.parse(balanceRopsten)*70).toStringAsFixed(2)+" INR"),
-
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(30),
-                    child: Container(
-                      child: checking? _loader():Text(balanceRopsten.toString()+" DAI", style: TextStyle(fontSize: 30),),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(10),
-                    child: Text("* You need to approve all before being able to deposit to matic", style: TextStyle(fontSize: 12,color: Colors.red),),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      keyboardType: TextInputType.numberWithOptions(decimal: true),
-                      controller: _amount,
-                      autovalidate: true,
-                      validator: (val) => val==""?null:(double.parse(val)<=0?
-                      "Invalid amount":
-                      null),
-                      obscureText: false,
-                      style: style,
-                      decoration: InputDecoration(
-                          contentPadding: EdgeInsets.fromLTRB(15,10,15,10),
-                          hintText: "DAIs to Send",
-                          border:
-                          OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
-                    ),
-                  ),
-
-                  RaisedButton(
-                    shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(200),
-                    ),
-                    color: Colors.blueAccent,
-                    child: Text("Transfer to matic"),
-                    onPressed: ()async{
-                      FocusScope.of(context).requestFocus(FocusNode());
-                      EthWrapper wrapper = new EthWrapper();
-                      await wrapper.checkEth().then((val){
-                        BigInt wei = val;
-                        if(wei<BigInt.from(1000000000000000)){
-                          _asyncConfirmDialog(context);
-                        }
-                        else{
-                          _deposit();
-                        }
-                      });
-                    },
-                  ),
-                  SizedBox(height: 10),
-                ],
-              ),
-            ),
-            txDeposit==""||txDeposit==null?SizedBox(height: 1,):Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Text(txApprove,style: TextStyle(fontSize: 10),),
-                FlatButton(
-                  onPressed: (){
-                    ClipboardManager.copyToClipBoard(txApprove).then((asd){
-                      Toast.show("Hash copied", context);
-                    });
-                  },
-                  child: Icon(Icons.content_copy),
-                )
-              ],
-            ),
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(
                   Radius.circular(10),
                 ),
               ),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
+                  loading!=5?_loader():Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      SizedBox(height: 40,),
+                      (hash==""||hash==" ")?Text("There are no transactions"):Wrap(
+                        direction: Axis.horizontal,
+                        children: <Widget>[
+                          FlatButton(
+                            child: Text(hash, maxLines: 2,style: TextStyle(fontWeight: FontWeight.bold,color: Colors.black),),
+                            onPressed: (){
+                              ClipboardManager.copyToClipBoard(hash).then((val){
+                                Toast.show("Hash Copied", context);
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      (hash==" "||hash=="")?Container(height: 0,width: 0,):((json["result"]["status"]=="1"?Text("Transaction has been merged"):Text("Transaction not merged yet"))),
+                      //js==null?Container(height: 0,width: 0,):
+                      SizedBox(
+                        height: 10,
+                      ),
+                      (hash==" "||hash=="")?Container(height: 0,width: 0,):(json==null?Container(height: 0,width: 0,):(json["result"]["status"]=="1"?Icon(Icons.check , size: 30,):SpinKitChasingDots(color: Colors.blue,size: 30,))),
+                      SizedBox(height: 40,),
 
-                        Row(
-                          children: <Widget>[
-                            Image.asset(
-                              "assets/matic.png",
-                              height: 30,
-                              width: 25,
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              "Matic",
-                              style: TextStyle(
-                                fontSize: 30,
-                              ),
-                            ),
-
-                          ],
-                        ),
-                        checkingMatic? _loader():Text((double.parse(balanceMatic)*70).toString()+" INR"),
-                      ],
-                    ),
+                    ],
                   ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(30),
-                    child: Container(
-                      child: checkingMatic?  _loader():Text(balanceMatic.toString()+" DAI", style: TextStyle(fontSize: 30),),
-                    ),
-                  ),
-
-                  RaisedButton(
-                    shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(200),
-                    ),
-                    color: Colors.blueAccent,
-                    child: Text("Transfer to Ropsten"),
-                    onPressed: (){},
-                  ),
-                  SizedBox(height: 10),
                 ],
+              )
+          ),
+          Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(10),
               ),
-            )
-          ],
-        ),
+            ),
+            child: transfering?_transfering():Column(
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+
+                      Row(
+                        children: <Widget>[
+                          Image.asset(
+                            "assets/eth.png",
+                            height: 30,
+                            width: 25,
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            "Ropsten",
+                            style: TextStyle(
+                              fontSize: 30,
+                            ),
+                          ),
+
+                        ],
+                      ),
+                      checking? _loader():Text((double.parse(balanceRopsten)*70).toStringAsFixed(2)+" INR"),
+
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(30),
+                  child: Container(
+                    child: checking? _loader():Text(balanceRopsten.toString()+" DAI", style: TextStyle(fontSize: 30),),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Text("* You need to approve all before being able to deposit to matic", style: TextStyle(fontSize: 12,color: Colors.red),),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    keyboardType: TextInputType.numberWithOptions(decimal: true),
+                    controller: _amount,
+                    autovalidate: true,
+                    validator: (val) => val==""?null:(double.parse(val)<=0?
+                    "Invalid amount":
+                    null),
+                    obscureText: false,
+                    style: style,
+                    decoration: InputDecoration(
+                        contentPadding: EdgeInsets.fromLTRB(15,10,15,10),
+                        hintText: "DAIs to Send",
+                        border:
+                        OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
+                  ),
+                ),
+
+                RaisedButton(
+                  shape: new RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(200),
+                  ),
+                  color: Colors.blueAccent,
+                  child: Text("Transfer to matic"),
+                  onPressed: ()async{
+                    FocusScope.of(context).requestFocus(FocusNode());
+                    EthWrapper wrapper = new EthWrapper();
+                    await wrapper.checkEth().then((val){
+                      BigInt wei = val;
+                      if(wei<BigInt.from(1000000000000000)){
+                        _asyncConfirmDialog(context);
+                      }
+                      else{
+                        _deposit();
+                      }
+                    });
+                  },
+                ),
+                SizedBox(height: 10),
+
+              ],
+            ),
+          ),
+
+          Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(10),
+              ),
+            ),
+            child: Column(
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+
+                      Row(
+                        children: <Widget>[
+                          Image.asset(
+                            "assets/matic.png",
+                            height: 30,
+                            width: 25,
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            "Matic",
+                            style: TextStyle(
+                              fontSize: 30,
+                            ),
+                          ),
+
+                        ],
+                      ),
+                      checkingMatic? _loader():Text((double.parse(balanceMatic)*70).toString()+" INR"),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(30),
+                  child: Container(
+                    child: checkingMatic?  _loader():Text(balanceMatic.toString()+" DAI", style: TextStyle(fontSize: 30),),
+                  ),
+                ),
+
+                RaisedButton(
+                  shape: new RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(200),
+                  ),
+                  color: Colors.blueAccent,
+                  child: Text("Transfer to Ropsten"),
+                  onPressed: (){},
+                ),
+                SizedBox(height: 10),
+              ],
+            ),
+          ),
+          SizedBox(height: 200,)
+
+        ],
       ),
     );
   }
@@ -300,19 +446,22 @@ class _WalletsState extends State<Wallets> {
   _deposit()async {
     Toast.show("Processing!", context,duration: Toast.LENGTH_LONG);
     setState(() {
-      transfering= true;
+      //transfering= true;
     });
-
-    EthWrapper wrapper = new EthWrapper();
-    await wrapper.depositERC20(double.parse(_amount.text)).then((val){
-      print("wallet:" +val);
-      setState(() {
-        txDeposit=val;
+    if(balanceRopsten=="0"||balanceRopsten=="0.0"){
+      Toast.show("Insufficient Funds", context);
+    }
+    else{
+      EthWrapper wrapper = new EthWrapper();
+      await wrapper.depositERC20(double.parse(_amount.text),).then((val){
+        print("wallet:" +val);
+        setState(() {
+          txDeposit=val;
+        });
       });
-    });
-    setState(() {
-      transfering =false;
-    });
+    }
+
+   _refreshTx();
   }
   Future<bool> _asyncConfirmDialog(BuildContext context) async {
     return showDialog<bool>(
@@ -363,25 +512,107 @@ class _WalletsState extends State<Wallets> {
       },
     );
   }
-  _approveAll()async {
+  _allow()async {
     EthWrapper wrapper = new EthWrapper();
     await wrapper.checkEth().then((val)async{
       BigInt wei = val;
-      if(wei<BigInt.from(1500000000000000)){
-        _asyncConfirmDialog(context);
+      if(balanceRopsten=="0"||balanceRopsten=="0.0"){
+        Toast.show("Insufficient Funds", context);
       }
       else{
-        EthWrapper wrapper = new EthWrapper();
-        var txall= await wrapper.allowanceToken();
-        var txappr = await wrapper.approveToken(double.parse(balanceRopsten));
-        Toast.show("In Proccess, wait for 2 minutes", context,duration: Toast.LENGTH_LONG);
-        setState(() {
-          txAllow=txall;
-          txApprove= txappr;
-        });
+
+        if(wei<BigInt.from(1500000000000000)){
+          _asyncConfirmDialog(context);
+        }
+        else{
+          EthWrapper wrapper = new EthWrapper();
+          await wrapper.allowanceToken().then((val)async{
+            SharedPreferences prefs =await SharedPreferences.getInstance();
+            prefs.setBool("allow", false);
+            prefs.setBool("transacting", true);
+            setState(() {
+              allowance= false;
+            });
+            _refreshTx();
+          });
+
+
+          Toast.show("In Proccess, wait for 2 minutes", context,duration: Toast.LENGTH_LONG);
+
+        }
       }
     });
   }
+  _approveAll()async {
+    print("called");
+    EthWrapper wrapper = new EthWrapper();
+    await wrapper.checkEth().then((val)async{
+      BigInt wei = val;
+      if(balanceRopsten=="0"||balanceRopsten=="0.0"){
+        Toast.show("Insufficient Funds", context);
+      }
+      else{
+        if(wei<BigInt.from(1500000000000000)){
+          _asyncConfirmDialog(context);
+        }
+        else{
+          EthWrapper wrapper = new EthWrapper();
+          await wrapper.approveToken(double.parse(balanceRopsten));
+          SharedPreferences prefs =await SharedPreferences.getInstance();
+          prefs.setBool("approve", false);
+          prefs.setBool("transacting", true);
+          setState(() {
+            approve = false;
+          });
+          _refreshTx();
+          Toast.show("In Proccess, wait for 2 minutes", context,duration: Toast.LENGTH_LONG);
+
+        }
+      }
+
+    });
+  }
+  _refreshTx(){
+    transacting =false;
+    json={"result":{"status":"0"}};
+    loading=0;
+    _getApproveStatus().then((val){
+      setState(() {
+        loading++;
+        approve =val;
+      });
+
+    });
+    _getAllownceStatus().then((val){
+      setState(() {
+        loading++;
+        allowance =val;
+      });
+
+    });
+    _getHash().then((str){
+      setState(() {
+        loading++;
+        hash= str;
+      });
+    });
+    _getStatus().then((val){
+      setState(() {
+        loading++;
+        transacting= val;
+      });
+
+    });
+    _getTransaction().then((json){
+      setState(() {
+        loading++;
+        //this.json= json;
+        print("check3:"+this.json.toString());
+      });
+    });
+
+  }
+
   _refresh()async {
     setState(() {
       checkingMatic= true;
