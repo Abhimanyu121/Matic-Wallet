@@ -1,4 +1,6 @@
 # Matic Wallet
+**Check Releases for apk.**</br>
+[Releases](https://github.com/Abhimanyu121/Matic-Wallet/releases/tag/Alpha-2)
 ## Aim
 Matic Wallet Aims to make transactions of crypto currencies(Currently Moon Token) Faster and cost effective by utilizing the enormous potential of Matic's Plasma chain.
 ## Description
