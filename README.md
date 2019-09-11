@@ -25,6 +25,7 @@ On combining all three of these it provides an efficient solution for the primar
 7. You can tap on transaction hash to copy it and check it on etherscan.
 8. Once transaction is merged, deposit tokend to matic chain.
 9. Transact the tokens over matic network as much as you like with its low cost and fast transactions.
+10. You can copy your address by taping on address in appbar.
 #### Note 1: It has a lot of jagged edge, in case it behaves abnomally, ping me on Telegram @abhimanyu121.
 #### Note 2: Please enter correct inputs, exceptional handling is not properly implmented yet.
 #### Note 3: Withdraw of tokens from matic network is not available as of now due to limited time.
