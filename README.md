@@ -1,5 +1,5 @@
 # Matic Wallet
-![Logo](assets/matic.png)
+![Logo](assets/matic.png)</br>
 **Check Releases for apk.**</br>
 [Releases](https://github.com/Abhimanyu121/Matic-Wallet/releases/tag/Alpha-2)
 ## Aim
