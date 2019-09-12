@@ -35,7 +35,7 @@ On combining all three of these it provides an efficient solution for the primar
 #### Note 1: It has a lot of jagged edge, in case it behaves abnomally, ping me on Telegram @abhimanyu121.
 #### Note 2: Please enter correct inputs, exceptional handling is not properly implmented yet.
 #### Note 3: Withdraw of tokens from matic network is not available as of now due to limited time.
-
+#### Note 4: Follow exact sequence of instructions.
 ## Screenshots
 |<img src="ss/01.jpg" width="400">|<img src="ss/2.jpg" width="400">
 |<img src="ss/4.jpg" width="400">|<img src="ss/3.jpg" width="400">
