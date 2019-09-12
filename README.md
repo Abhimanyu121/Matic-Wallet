@@ -25,11 +25,11 @@ On combining all three of these it provides an efficient solution for the primar
 4. Generate a new account or enter private key(generate new account for testing, instead of using primary account).
 5. Go to cards section and add some tokens to your wallet(Check email for transaction hash, and check it on ropsten etherscan).
 5. In wallets tab, tap on  approve all and refresh in a while(till transaction gets merged).
-6. If prompt comes up saying insufficient ether, tap on add ether and check transaction status from link on mail.
+6. If prompt comes up saying insufficient ether, tap on add ether and check transaction status from link on mail and once ether is added click on approve all again..
 6. Then tap on allow all button to allow matic contract to spend dai(Moon tokens).
-7. You can tap on transaction hash to copy it and check it on etherscan.
+7. You can tap on transaction hash to copy it and check it on etherscan or click on right refresh button to check status.
 8. Once transaction is merged, deposit tokend to matic chain.
-9. If transaction fails, top button will change to "allow increase" to allow user to increasr spending limit for root chain contract.
+9. If transaction fails, top button will change to "allow increase" to allow user to increase spending limit for root chain contract.
 10. Transact the tokens over matic network as much as you like with its low cost and fast transactions.
 11. You can copy  addresses and transaction hash by taping on them.
 #### Note 1: It has a lot of jagged edge, in case it behaves abnomally, ping me on Telegram @abhimanyu121.
