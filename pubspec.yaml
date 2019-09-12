@@ -31,6 +31,7 @@ dependencies:
   bip39: ^1.0.3
   bitcoin_flutter: 0.1.1
   clipboard_manager: ^0.0.1
+  background_fetch: '^0.1.0'
 
 dev_dependencies:
   flutter_test:

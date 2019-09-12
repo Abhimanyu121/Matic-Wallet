@@ -4,6 +4,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:crypto_app_ui/wrappers/moonPayWrapper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
+import 'withdraw.dart';
 import 'package:clipboard_manager/clipboard_manager.dart';
 import 'package:crypto_app_ui/wrappers/ScannerWRapper.dart';
 class Wallets extends StatefulWidget {
@@ -447,7 +448,12 @@ _check()async{
                   ),
                   color: Colors.blueAccent,
                   child: Text("Transfer to Ropsten"),
-                  onPressed: (){},
+                  onPressed: (){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Withdraw()),
+                    );
+                  },
                 ),
                 SizedBox(height: 10),
               ],
@@ -695,5 +701,6 @@ _check()async{
        });
      });
   }
+
 }
 
