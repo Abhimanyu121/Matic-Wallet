@@ -16,7 +16,9 @@ On combining all three of these it provides an efficient solution for the primar
 - [x] Depositing Moon Tokens(approve, allowance and deposit) to Matic network.
 - [x] Checking status of transactions uisng etherscan.
 - [x] Checking Transaction history on matic network
-- [ ] Withdrawl of Tokens from matic to Ropsten.
+- [x] Native platform channel for Foreground services.
+- [x] Web3J dependencies to for interacting with contract from foreground services
+- [ ] Withdrawl of Tokens from matic to Ropsten(WIP).
 - [ ] Moving heavy and time consuming transactions to background service.
 ## How to use
 1. Login with your email.
