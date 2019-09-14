@@ -31,7 +31,7 @@ dependencies:
   bip39: ^1.0.3
   bitcoin_flutter: 0.1.1
   clipboard_manager: ^0.0.1
-  background_fetch: '^0.1.0'
+  foreground_service: ^0.3.0
 
 dev_dependencies:
   flutter_test:
@@ -56,6 +56,7 @@ flutter:
     - assets/StandardToken.json
     - assets/visa.png
     - assets/RootChain.json
+    - assets/ChildERC20.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

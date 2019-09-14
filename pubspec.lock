@@ -8,13 +8,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0"
-  background_fetch:
-    dependency: "direct main"
-    description:
-      name: background_fetch
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.2"
   bip32:
     dependency: transitive
     description:
@@ -123,6 +116,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  foreground_service:
+    dependency: "direct main"
+    description:
+      name: foreground_service
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.0"
   hex:
     dependency: transitive
     description:

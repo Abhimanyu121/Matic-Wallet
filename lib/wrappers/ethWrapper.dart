@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:shared_preferences/shared_preferences.dart';
 class EthWrapper{
+  Map json;
   final rootChainAddress = "0x60e2b19b9a87a3f37827f2c8c8306be718a5f9b4";
   final moonRopsten = "0x48b0c1d90c3058ab032c44ec52d98633587ee711";
   Future<String> checkBalanceRopsten()async{
@@ -130,9 +131,9 @@ class EthWrapper{
           await client.dispose().then((vod)async {
             prefs.setString("hash", hash);
             prefs.setBool("transacting", true);
+            return hash;
 
           });
-          return hash;
         });
        // await client.dispose();
 
@@ -173,9 +174,9 @@ class EthWrapper{
           await client.dispose().then((vod)async {
             prefs.setString("hash", hash);
             prefs.setBool("transacting", true);
+            return hash;
 
           });
-          return hash;
         });
 
 
@@ -216,9 +217,8 @@ class EthWrapper{
           await client.dispose().then((vod)async {
             prefs.setString("hash", hash);
             prefs.setBool("transacting", true);
-
+            return hash;
           });
-          return hash;
         });
 
 
@@ -290,6 +290,53 @@ class EthWrapper{
       });
     await client.dispose();
     return retbal;
+
+  }
+  Future<dynamic> withdrawErc20 (double amount,)async {
+
+    var apiUrl = "https://testnet2.matic.network";
+    final client = Web3Client(apiUrl, http.Client(), enableBackgroundIsolate: true);
+    rootBundle.loadString('assets/ChildERC20.json').then((abi) async {
+      await SharedPreferences.getInstance().then((prefs)async {
+        String privateKey = prefs.getString("privateKey");
+        Credentials credentials = EthPrivateKey.fromHex(privateKey);
+        final address = await credentials.extractAddress();
+        print(address);
+        final contract = DeployedContract(
+            ContractAbi.fromJson(abi, "ChildERC20"),
+            EthereumAddress.fromHex("0xb35456a9b634cf85569154321596ee2d62e215ba"));
+        var withdraw = contract.function('withdraw');
+        await client.sendTransaction(
+          credentials,
+          Transaction.callContract(
+              contract: contract,
+              function: withdraw,
+              // nonce: Random.secure().nextInt(100),
+              gasPrice: EtherAmount.inWei(BigInt.from(0 )),
+              maxGas: 4000000,
+              //nonce: int.parse(nonce),
+              parameters: [
+
+                BigInt.from(1 * 1000) * BigInt.from(1000000000000000)
+              ]
+          ),
+
+          chainId: 8995,
+
+        ).then((hash)async{
+          print("completing approve:"+hash );
+          prefs.setString("bghash", hash);
+          prefs.setBool("transacting", true);
+          await client.dispose().then((vod)async {
+
+          });
+          return hash;
+        });
+        // await client.dispose();
+
+      });
+
+    });
 
   }
 }

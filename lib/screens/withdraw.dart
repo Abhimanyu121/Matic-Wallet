@@ -1,11 +1,17 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:flutter/services.dart';
+import 'package:toast/toast.dart';
+import 'dart:io';
+import 'package:crypto_app_ui/wrappers/ethWrapper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:foreground_service/foreground_service.dart';
 class Withdraw extends StatefulWidget{
   @override
   WithdrawUi createState()=> new WithdrawUi();
 }
 class WithdrawUi extends State<Withdraw>{
+  static const platform = const MethodChannel('WithdrawFunds');
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 15.0);
   TextEditingController _amount = new TextEditingController();
   @override
@@ -78,13 +84,37 @@ class WithdrawUi extends State<Withdraw>{
           ),
           color: Colors.blueAccent,
           child: Text("Transfer to matic"),
-          onPressed: ()async {
+          onPressed: () {
             FocusScope.of(context).requestFocus(FocusNode());
+            _startWithdraw();
           }
         ),
         SizedBox(height: 10),
       ],
     );
   }
+  _fgserivce(){
+    ForegroundService.startForegroundService(_sleep());
+  }
+  _sleep(){
+    EthWrapper wrapper = new EthWrapper();
+    var hash=wrapper.withdrawErc20(20.0);
+    print(hash);
+  }
+  Future<void> _startWithdraw() async {
+    await SharedPreferences.getInstance().then((prefs)async {
+      var privateKey= prefs.getString("privateKey");
+      try {
+        final int result = await platform.invokeMethod('startWithdraw',{"privateKey":privateKey, "value":1});
+        Toast.show("starting service"+result.toString(), context);
+        print("Startig service:"+result.toString());
+      } on PlatformException catch (e) {
+        print("Faild to start service:"+ e.message.toString());
+        Toast.show("Failed to start service", context);
+      }
+    });
+
+  }
+
 
 }

@@ -7,6 +7,8 @@ import 'package:toast/toast.dart';
 import 'withdraw.dart';
 import 'package:clipboard_manager/clipboard_manager.dart';
 import 'package:crypto_app_ui/wrappers/ScannerWRapper.dart';
+import 'package:foreground_service/foreground_service.dart';
+import 'background.dart';
 class Wallets extends StatefulWidget {
   @override
   _WalletsState createState() => new _WalletsState();
@@ -29,6 +31,7 @@ class _WalletsState extends State<Wallets> {
   var _amount = new TextEditingController();
   bool checkingMatic= true;
   bool transfering =false;
+
   _loader(){
     return SpinKitChasingDots(size: 30,color: Colors.indigo,);
   }
@@ -211,6 +214,32 @@ _check()async{
                   onPressed: _refresh,
                   shape: RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0))
               ),
+//              RaisedButton(
+//                  child: Icon(Icons.refresh),
+//                  onPressed: ()async {
+//                    EthWrapper wrapper = new EthWrapper();
+//                    BigInt wei = await wrapper.checkEth();
+//                      if(balanceRopsten=="0"||balanceRopsten=="0.0"){
+//                      Toast.show("Insufficient Funds", context);
+//                      }
+//                      else {
+//                        if (wei < BigInt.from(1500000000000000)) {
+//                          _asyncConfirmDialog(context);
+//                        }else{
+//
+//                          depositBg bg= new depositBg();
+//                          print("here");
+//
+//                          await ForegroundService.startForegroundService( bg.init(double.parse(balanceRopsten)));
+//                          print("here");
+//
+//                        }
+//
+//                      }
+//
+//                  },
+//                  shape: RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0))
+//              ),
               RaisedButton(
                   child: loading!=5?_loader():(transacting?Text("Refresh Transaction"):(approve?Text("Approve all"):(allowance?Text("Allow Contract"):((json["message"]=="NOTOK"||json["result"]["status"]=="0")?Text("Increase Allowance"):Text("Refresh"))))),
                   onPressed:(){
@@ -479,12 +508,16 @@ _check()async{
     );
   }
   _deposit()async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     Toast.show("Processing!", context,duration: Toast.LENGTH_LONG);
     setState(() {
       //transfering= true;
     });
     if(balanceRopsten=="0"||balanceRopsten=="0.0"){
       Toast.show("Insufficient Funds", context);
+    }
+    else if (prefs.getBool("transacting")==true){
+      Toast.show("Another transaction in progress", context, duration: Toast.LENGTH_LONG);
     }
     else{
       EthWrapper wrapper = new EthWrapper();
