@@ -22,6 +22,7 @@ class Login_email_ui extends State<Login_email>{
   bool file= false;
   bool card = false;
   bool gen= false;
+  bool _autoValidateEmail = false;
   MoonPayWrapper wrapper = new MoonPayWrapper();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   var _email = new TextEditingController();
@@ -96,6 +97,7 @@ class Login_email_ui extends State<Login_email>{
             else {
               setState(() {
                 checking = false;
+                _autoValidateEmail = true;
               });
               Toast.show("Invalid Email", context);
             }
@@ -108,7 +110,7 @@ class Login_email_ui extends State<Login_email>{
     }
     final emailui = TextFormField(
       keyboardType: TextInputType.emailAddress,
-      autovalidate: true,
+      autovalidate: _autoValidateEmail,
       validator: (val) => !EmailValidator.validate(val, true)
           ? 'Not a valid email.'
           : null,
