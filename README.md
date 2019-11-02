@@ -4,6 +4,8 @@
 [Releases](https://github.com/Abhimanyu121/Matic-Wallet/releases/tag/Alpha-2)
 ## Aim
 Matic Wallet Aims to make transactions of crypto currencies(Currently Moon Token) Faster and cost effective by utilizing the enormous potential of Matic's Plasma chain.
+## Achievements
+This application has won matic bounty of 2000USD in gitcoin Grow Ethereal hackathon.
 ## Description
 Matic Wallet in testing phase has three layers of technology,
 1. Moonpay - It proivdes easy and efficient fiat to Crypto Interface
